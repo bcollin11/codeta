@@ -1,0 +1,15 @@
+{% extends "helpers/layout.html" %}
+{% block title %}Create Course{% endblock %}
+{% block body %}
+    {% from "helpers/_formhelpers.html" import render_field %}
+    <form method="post" action="">
+        <dl>
+            {{ render_field(form.name) }}
+            {{ render_field(form.ident) }}
+            {{ render_field(form.section) }}
+            {{ render_field(form.description) }}
+        </dl>
+        <input type="submit" value="Create">
+    </form>
+
+{% endblock %}

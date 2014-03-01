@@ -139,6 +139,36 @@ class CodetaTestCase(unittest.TestCase):
                 'wrong password')
         assert b'Invalid username or password.' in rc.data
 
+    def test_create_delete_course(self):
+        """
+            Test creating and deleting courses for a user
+        """
+        self.register(
+                app.config['TEST_USER'],
+                app.config['TEST_PW'])
+
+        rc = self.login(
+                app.config['TEST_USER'],
+                app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.app.post("/%s/add" % (app.config['TEST_USER']),
+                data={
+                    'course_name':         app.config['TEST_COURSE_NAME'],
+                    'course_ident':        app.config['TEST_COURES_IDENT'],
+                    'course_section':      app.config['TEST_COURSE_SECTION'],
+                    'course_description':  app.config['TEST_COURSE_DESCRIPTION']
+                })
+        logger.debug(rc.data)
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
+
+        rc = self.app.post("/%s/delete" % (app.config['TEST_USER']),
+                data={
+                    'course_name':  app.config['TEST_COURSE_NAME'],
+                    'verification': app.config['TEST_COURSE_NAME'],
+                })
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) not in rc.data
+
     def test_logout_redirect(self):
         """ test logging out without being logged in """
         rc = self.logout()
@@ -146,7 +176,7 @@ class CodetaTestCase(unittest.TestCase):
 
     def test_errors(self):
         """ test 404 error page """
-        rc = self.app.get('/this_should_not_exist', follow_redirects=True)
+        rc = self.app.get('/this/should/not/exist/ever/', follow_redirects=True)
         assert b'404 error :(' in rc.data
 
 

@@ -31,7 +31,7 @@ create table if not exists Course (
     course_id bigserial primary key,
     name varchar(100) not null,
     identifier varchar(20),
-    section integer,
+    section varchar(10),
     instructor_id integer,
     description text,
 

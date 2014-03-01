@@ -4,4 +4,33 @@
 
 <h1>Welcome to Code TA</h1>
 
+{% if g.user.is_authenticated() %}
+
+    <div id="user_courses">
+        {% if courses %}
+            <ul>
+                {% for c in courses %}
+                    <li>{{ c }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span>You are not currently enrolled in any courses</span>
+        {% endif %}
+    </div>
+
+    <div id="course_create_window">
+        <span class="window_title">Create a new course</span>
+        {% from "helpers/_formhelpers.html" import render_field %}
+        <form method="post" action="/{{ g.user.username }}/add">
+            <dl>
+                {{ render_field(form.course_name) }}
+                {{ render_field(form.course_ident) }}
+                {{ render_field(form.course_section) }}
+                {{ render_field(form.course_description) }}
+            </dl>
+            <input type="submit" value="Create">
+        </form>
+    </div>
+
+{% endif %}
 {% endblock %}
