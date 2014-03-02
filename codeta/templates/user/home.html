@@ -10,7 +10,7 @@
         {% if courses %}
             <ul>
                 {% for c in courses %}
-                    <li>{{ c }}</li>
+                    <li>Course: {{ c.get('title') }}</li>
                 {% endfor %}
             </ul>
         {% else %}
@@ -21,9 +21,9 @@
     <div id="course_create_window">
         <span class="window_title">Create a new course</span>
         {% from "helpers/_formhelpers.html" import render_field %}
-        <form method="post" action="/{{ g.user.username }}/add">
+        <form method="post" action="/{{ g.user.username }}/new">
             <dl>
-                {{ render_field(form.course_name) }}
+                {{ render_field(form.course_title) }}
                 {{ render_field(form.course_ident) }}
                 {{ render_field(form.course_section) }}
                 {{ render_field(form.course_description) }}

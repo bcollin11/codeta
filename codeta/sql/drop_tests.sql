@@ -4,6 +4,7 @@
 */
 
 delete from Users;
+delete from Course;
 delete from Instructor;
 delete from InstructorTeachesCourse;
 delete from StudentEnrollsCourse;

@@ -176,6 +176,8 @@ class Postgres(object):
                 fetchone - returns the result of a fetchone against the cursor
                 commit - if commit, then the query requires a commit
                 returning - returns data from the row inserted
+                return_dict - return a list of dictionaries with the column name as the key
+                and the value as the dictionary
             ]
 
         """
@@ -197,13 +199,18 @@ class Postgres(object):
                 if 'returning' in args:
                     result = cur.fetchone()[0]
 
+                if 'return_dict' in args:
+                    colnames = [desc[0] for desc in cur.description]
+                    result_dicts = [ dict(zip(colnames, row)) for row in result ]
+                    result = result_dicts
+
                 if 'commit' in args:
                     db.commit()
 
             except psycopg2.IntegrityError, e:
                 logger.warn('db_query failed: %s' % (e[0]))
                 logger.debug('db_query == %s data == %s' % (sql, data))
-                cur.rollback()
+                db.rollback()
                 result = None
             except Exception, e:
                 logger.warn('db_query failed: %s' % (e[0]))

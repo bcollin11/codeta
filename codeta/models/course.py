@@ -14,12 +14,12 @@ class Course(object):
             Initialize a new course.
         """
 
-    def add_course(self, user_id, name, ident, section, description):
+    def add_course(self, user_id, title, ident, section, description):
         """ Add a new course that the user is teaching """
 
         sql = ("""
             insert into Course
-                (instructor_id, name, identifier, section, description)
+                (course_id, title, identifier, section, description)
             values
                 (%s, %s, %s, %s, %s)
             returning
@@ -29,9 +29,9 @@ class Course(object):
 
         data = (
             int(user_id),
-            name,
+            title,
             ident,
-            int(section),
+            section,
             description,
         )
 
@@ -45,7 +45,7 @@ class Course(object):
         """
         sql = ("""
             insert into InstructorTeachesCourse
-                (instructor_id, course_id)
+                (user_id, course_id)
             values
                 (%s, %s)
             """
@@ -60,7 +60,7 @@ class Course(object):
 
     def get_courses(user_id):
         """
-            static function to fetches a list of tuples, each tuple
+            static function to fetches a list of dictionaries, each tuple
             containing a course the user is an instructor in.
 
             Returns the list on success, None on error
@@ -68,42 +68,45 @@ class Course(object):
 
         sql = ("""
             select
-                c.course_id, c.name, c.section, c.instructor_id
+                c.course_id, c.title, c.section
             from
                 Course c, InstructorTeachesCourse i
             where
                 c.course_id = i.course_id
             and
-                i.instructor_id = (%s)
+                i.user_id = (%s)
             """
         )
 
         data = (int(user_id), )
 
-        courses = app.db.exec_query(sql, data, 'fetchall')
+        courses = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
+        logger.debug('courses: %s' % courses)
         return courses
 
     get_courses = Callable(get_courses)
 
-    def delete_course(self, user_id, coursename):
+    def get_course_id(self, courses, course_title):
+        """ Get the course ID for a given course_title and courses list """
+        course_id = None
+        for course in courses:
+            if course.get('title') == course_title:
+                course_id = course.get('course_id')
+                break
+        return course_id
+
+    def delete_course(self, course_id):
         """ Delete a course with the given name """
-        course_id = [ x[2] for course in self.get_courses(user_id) if course[2] == coursename ]
-        logger.debug("Course ID: %s" % course_id)
 
         sql = ("""
             delete from
-                Course c, InstructorTeachesCourse i
+                Course c
             where
-                c.name = (%s)
-            and
                 c.course_id = (%s)
-            and
-                c.course_id = i.course_id
             """
         )
 
         data = (
-            coursename,
             int(course_id),
         )
 

@@ -18,7 +18,7 @@ TEST_PW = 'test_password'
 
 # Course
 TEST_COURSE_NAME = 'test_course'
-TEST_COURES_IDENT = 'CSET'
+TEST_COURSE_IDENT = 'CSET'
 TEST_COURSE_SECTION = '001'
 TEST_COURSE_DESCRIPTION = 'Test course description text'
 

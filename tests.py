@@ -67,6 +67,37 @@ class CodetaTestCase(unittest.TestCase):
             'lname': lname
             }, follow_redirects=True)
 
+    def create_course(self, username, course_title, ident=None, section=None,
+            description=None):
+
+        if ident is None:
+            ident = app.config['TEST_COURSE_IDENT']
+
+        if section is None:
+            section = app.config['TEST_COURSE_SECTION']
+
+        if description is None:
+            description = app.config['TEST_COURSE_DESCRIPTION']
+
+        return self.app.post("/%s/new" % username,
+                data={
+                    'course_title': course_title,
+                    'course_ident': ident,
+                    'course_section': section,
+                    'course_description': description
+                }, follow_redirects=True)
+
+    def delete_course(self, username, course_title, verification=None):
+
+        if verification is None:
+            verification = course_title
+
+        return self.app.post("/%s/%s/delete" % (username, course_title),
+            data={
+                'course_title':  course_title,
+                'verification': verification,
+            }, follow_redirects=True)
+
     def login(self, username, password):
         return self.app.post('/login', data=dict(
             username = username,
@@ -152,21 +183,14 @@ class CodetaTestCase(unittest.TestCase):
                 app.config['TEST_PW'])
         assert b'Logout' in rc.data
 
-        rc = self.app.post("/%s/add" % (app.config['TEST_USER']),
-                data={
-                    'course_name':         app.config['TEST_COURSE_NAME'],
-                    'course_ident':        app.config['TEST_COURES_IDENT'],
-                    'course_section':      app.config['TEST_COURSE_SECTION'],
-                    'course_description':  app.config['TEST_COURSE_DESCRIPTION']
-                })
-        logger.debug(rc.data)
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
 
-        rc = self.app.post("/%s/delete" % (app.config['TEST_USER']),
-                data={
-                    'course_name':  app.config['TEST_COURSE_NAME'],
-                    'verification': app.config['TEST_COURSE_NAME'],
-                })
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) not in rc.data
 
     def test_logout_redirect(self):

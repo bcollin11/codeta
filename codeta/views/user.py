@@ -15,7 +15,7 @@ from flask.ext.login import (current_user, login_required,
 
 from codeta import app, login_manager, logger
 from codeta.forms.registration import RegistrationForm
-from codeta.forms.course import CourseCreateForm
+from codeta.forms.course import CourseCreateForm, CourseDeleteForm
 from codeta.forms.login import LoginForm
 from codeta.models.course import Course
 
@@ -69,7 +69,7 @@ def user_home(username):
         courses = g.user.get_courses()
     return render_template('user/home.html', form=form, courses=courses)
 
-@app.route('/<username>/add', methods=['POST'])
+@app.route('/<username>/new', methods=['POST'])
 def course_add(username):
     """
         User can create a course here
@@ -82,27 +82,17 @@ def course_add(username):
         # user can create the course
         course = Course()
         course.add_course(g.user.user_id,
-                request.form['course_name'],
+                request.form['course_title'],
                 request.form['course_ident'],
                 request.form['course_section'],
                 request.form['course_description'])
         g.user.update_courses()
 
-    if not g.user.is_anonymous():
-        courses = g.user.get_courses()
+    return redirect(url_for('user_home', username=username))
 
-    return render_template('user/home.html', form=form, courses=courses)
-
-@app.route('/<username>/<course>/')
-def course_home(username, course):
-    """
-        Homepage for the course, displays recent assignments
-    """
-    return 'User %s, course %s' % (username, course)
-
-@app.route('/<username>/<coursename>/delete')
+@app.route('/<username>/<course_title>/delete', methods=['POST'])
 @login_required
-def course_delete(username, coursename):
+def course_delete(username, course_title):
     """
         Lets a user delete a course
     """
@@ -112,14 +102,17 @@ def course_delete(username, coursename):
     form.validate():
         # user owns and can delete the course
         course = Course()
-        course.delete_course(g.user.user_id, coursename)
+        course_id = course.get_course_id(g.user.get_courses(), course_title)
+        course.delete_course(course_id)
         g.user.update_courses()
+    return redirect(url_for('user_home', username=username))
 
-    courses = None
-    if not g.user.is_anonymous():
-        courses = g.user.get_courses()
-
-    return render_template('user/home.html', courses=courses)
+@app.route('/<username>/<course>/')
+def course_home(username, course):
+    """
+        Homepage for the course, displays recent assignments
+    """
+    return 'User %s, course %s' % (username, course)
 
 @app.route('/logout')
 @login_required
