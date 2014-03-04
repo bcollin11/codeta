@@ -24,6 +24,7 @@ class CodetaTestCase(unittest.TestCase):
     def setUp(self):
         """ create tables in database for each test """
         self.app = app.test_client()
+        app.config['WTF_CSRF_ENABLED'] = False
         db.init_db()
 
     def tearDown(self):
@@ -188,10 +189,44 @@ class CodetaTestCase(unittest.TestCase):
                 app.config['TEST_COURSE_NAME'])
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
 
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'This course already exists.' in rc.data
+
         rc = self.delete_course(
                 app.config['TEST_USER'],
                 app.config['TEST_COURSE_NAME'])
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) not in rc.data
+
+        # create course again for delete test
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
+
+        # make sure only the owner of the account can create a course
+        rc = self.create_course('a_different_user', 'course_should_not_exist')
+        assert b'You can not create a course here.' in rc.data
+
+        # make sure only owner can delete a course
+        self.logout()
+        self.register('test_user2', app.config['TEST_PW'])
+        rc = self.login('test_user2', app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
+        assert b'You can not delete a course you do not own.' in rc.data
+
+        self.logout()
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
+        assert b'Login to Code TA' in rc.data
 
     def test_logout_redirect(self):
         """ test logging out without being logged in """

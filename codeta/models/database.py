@@ -80,6 +80,28 @@ class Postgres(object):
 
         return conn
 
+    def check_exists(self, sql, data, *args, **kwargs):
+        """
+            Wrapper to check if data exists in the database.
+
+            Only contains error handling for sql SELECT.
+            If you need another query, use exec_query()
+        """
+
+        with self.app.app_context():
+            db = self.get_db()
+            cur = db.cursor()
+            result = None
+
+            try:
+                cur.execute(sql, data)
+                result = cur.fetchone()
+
+            except Exception, e:
+                result = None
+
+            return result
+
     def get_db(self):
         """
             Gets the current database cursor or creates one if not found
@@ -125,10 +147,9 @@ class Postgres(object):
             if username:
                 db = self.get_db()
                 cur = db.cursor()
-                cur.execute("SELECT username FROM Users WHERE username like (%s)", (username, ))
+                cur.execute("SELECT username FROM Users WHERE username = (%s)", (username, ))
                 user = cur.fetchone()
                 cur.close()
-
         return user
 
     def init_db(self):
