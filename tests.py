@@ -187,6 +187,7 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.create_course(
                 app.config['TEST_USER'],
                 app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
 
         rc = self.create_course(

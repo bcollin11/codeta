@@ -20,7 +20,7 @@ class CourseCreateForm(Form):
     course_title = TextField('Course title', [
         validators.Required(),
         validators.Length(max=100),
-        Exists('title', 'This course already exists.')]
+        Exists(True, 'This course already exists.')]
     )
     course_ident = TextField('Course ident', [validators.Required(), validators.Length(max=20)])
     course_section = TextField('Course section', [validators.Required()])

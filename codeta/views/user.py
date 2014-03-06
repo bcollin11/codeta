@@ -19,6 +19,7 @@ from codeta.forms.course import CourseCreateForm, CourseDeleteForm
 from codeta.forms.validators import Exists
 from codeta.forms.login import LoginForm
 from codeta.models.course import Course
+from codeta.models.user import User
 
 @app.route('/')
 def homepage():
@@ -63,10 +64,10 @@ def user_home(username):
         User's homepage. Displays things about their courses
         and current assignments
     """
-    courses=None
-    if g.user.is_authenticated():
-        courses = g.user.get_courses()
-    return render_template('user/home.html', courses=courses)
+    u = User(None, username, None, None)
+    courses = u.get_courses()
+
+    return render_template('user/home.html', courses=courses, username=username)
 
 @app.route('/<username>/new', methods=['GET', 'POST'])
 @login_required
@@ -77,16 +78,20 @@ def course_add(username):
     form = None
     if g.user.is_authenticated():
         if g.user.username == username:
-            form = CourseCreateForm(g.user.get_courses())
+            form = CourseCreateForm(g.user.get_course_titles())
             if form.validate_on_submit():
                 # user can create the course
-                course = Course()
-                rc = course.add_course(g.user.user_id,
-                        request.form['course_title'],
+                course = Course(request.form['course_title'],
                         request.form['course_ident'],
                         request.form['course_section'],
-                        request.form['course_description'])
-                g.user.update_courses()
+                        request.form['course_description'],
+                        g.user.user_id)
+                course_id = course.add_course()
+                if course_id:
+                    course.add_instructor(g.user.user_id, course_id)
+                    g.user.add_course(course)
+                else:
+                    flash('There was an error adding your class, please try again later.')
                 return redirect(url_for('user_home', username=username))
             else:
                 # there were errors on the form
@@ -111,9 +116,9 @@ def course_delete(username, course_title):
             form = CourseDeleteForm()
             if form.validate_on_submit():
                 # user owns and can delete the course
-                course = Course()
-                course_id = course.get_course_id(g.user.get_courses(), course_title)
-                course.delete_course(course_id)
+                course_id = [ c.course_id for c in g.user.get_courses()
+                        if c.title == course_title and c.instructor_id == g.user.user_id]
+                Course.delete_course(int(course_id[0]))
                 g.user.update_courses()
                 flash('Course %s successfully deleted' % course_title)
                 return redirect(url_for('user_home', username=username))

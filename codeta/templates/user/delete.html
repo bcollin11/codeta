@@ -5,18 +5,6 @@
 <h1>Delete a course</h1>
 
 {% if g.user.is_authenticated() %}
-    <div id="user_courses">
-        {% if courses %}
-            <ul>
-                {% for c in courses %}
-                    <li>Course: {{ c.get('title') }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <span>You are not currently enrolled in any courses</span>
-        {% endif %}
-    </div>
-
     {% if form %}
         <div id="course_create_window">
             <span class="window_title">Delete a course</span>
@@ -27,7 +15,7 @@
                     {{ render_field(form.verification) }}
                     {{ form.hidden_tag() }}
                 </dl>
-                <input type="submit" value="Create">
+                <input type="submit" value="Delete">
             </form>
         </div>
     {% endif %}
