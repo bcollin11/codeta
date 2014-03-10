@@ -24,6 +24,7 @@ class CodetaTestCase(unittest.TestCase):
     def setUp(self):
         """ create tables in database for each test """
         self.app = app.test_client()
+        app.config['WTF_CSRF_ENABLED'] = False
         db.init_db()
 
     def tearDown(self):
@@ -65,6 +66,37 @@ class CodetaTestCase(unittest.TestCase):
             'confirm_email': email2,
             'fname': fname,
             'lname': lname
+            }, follow_redirects=True)
+
+    def create_course(self, username, course_title, ident=None, section=None,
+            description=None):
+
+        if ident is None:
+            ident = app.config['TEST_COURSE_IDENT']
+
+        if section is None:
+            section = app.config['TEST_COURSE_SECTION']
+
+        if description is None:
+            description = app.config['TEST_COURSE_DESCRIPTION']
+
+        return self.app.post("/%s/new" % username,
+                data={
+                    'course_title': course_title,
+                    'course_ident': ident,
+                    'course_section': section,
+                    'course_description': description
+                }, follow_redirects=True)
+
+    def delete_course(self, username, course_title, verification=None):
+
+        if verification is None:
+            verification = course_title
+
+        return self.app.post("/%s/%s/delete" % (username, course_title),
+            data={
+                'course_title':  course_title,
+                'verification': verification,
             }, follow_redirects=True)
 
     def login(self, username, password):
@@ -139,6 +171,64 @@ class CodetaTestCase(unittest.TestCase):
                 'wrong password')
         assert b'Invalid username or password.' in rc.data
 
+    def test_create_delete_course(self):
+        """
+            Test creating and deleting courses for a user
+        """
+        self.register(
+                app.config['TEST_USER'],
+                app.config['TEST_PW'])
+
+        rc = self.login(
+                app.config['TEST_USER'],
+                app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
+
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'This course already exists.' in rc.data
+
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) not in rc.data
+
+        # create course again for delete test
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
+
+        # make sure only the owner of the account can create a course
+        rc = self.create_course('a_different_user', 'course_should_not_exist')
+        assert b'You can not create a course here.' in rc.data
+
+        # make sure only owner can delete a course
+        self.logout()
+        self.register('test_user2', app.config['TEST_PW'])
+        rc = self.login('test_user2', app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
+        assert b'You can not delete a course you do not own.' in rc.data
+
+        self.logout()
+        rc = self.delete_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        logger.debug(rc.data)
+        assert b'Login to Code TA' in rc.data
+
     def test_logout_redirect(self):
         """ test logging out without being logged in """
         rc = self.logout()
@@ -146,7 +236,7 @@ class CodetaTestCase(unittest.TestCase):
 
     def test_errors(self):
         """ test 404 error page """
-        rc = self.app.get('/this_should_not_exist', follow_redirects=True)
+        rc = self.app.get('/this/should/not/exist/ever/', follow_redirects=True)
         assert b'404 error :(' in rc.data
 
 
