@@ -66,6 +66,7 @@ def load_user(user_id):
 # Import all our models and views
 from codeta.views.user import *
 from codeta.views.util import *
+from codeta.views.main import *
 
 from codeta.models.user import User
 
