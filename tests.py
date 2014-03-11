@@ -114,7 +114,6 @@ class CodetaTestCase(unittest.TestCase):
             Test the homepage for a user who has not logged in
         """
         rc = self.app.get('/')
-        assert b'Welcome to Code TA' in rc.data
         assert b'Logout' not in rc.data
 
     def test_register(self):
@@ -159,7 +158,7 @@ class CodetaTestCase(unittest.TestCase):
         assert b'Logout' in rc.data
 
         rc = self.logout()
-        assert b'You logged out.' in rc.data
+        assert b'You are logged out.' in rc.data
 
         rc = self.login(
                 app.config['TEST_USER'],
@@ -187,7 +186,6 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.create_course(
                 app.config['TEST_USER'],
                 app.config['TEST_COURSE_NAME'])
-        logger.debug(rc.data)
         assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
 
         rc = self.create_course(
@@ -219,20 +217,21 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.delete_course(
                 app.config['TEST_USER'],
                 app.config['TEST_COURSE_NAME'])
-        logger.debug(rc.data)
         assert b'You can not delete a course you do not own.' in rc.data
 
         self.logout()
         rc = self.delete_course(
                 app.config['TEST_USER'],
                 app.config['TEST_COURSE_NAME'])
-        logger.debug(rc.data)
         assert b'Login to Code TA' in rc.data
 
     def test_logout_redirect(self):
         """ test logging out without being logged in """
+        rc = self.app.get('/')
+        assert b'Logout' not in rc.data
+
         rc = self.logout()
-        assert b'You logged out.' in rc.data
+        assert b'Login' in rc.data
 
     def test_errors(self):
         """ test 404 error page """
