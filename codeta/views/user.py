@@ -1,7 +1,7 @@
 """
-    Contains views that users directly access.
+    Views that manage a user's account.
 
-    Includes login/logout, homepage, account management,
+    Includes login/logout, join, user homepage, account settings,
     etc.
 
 """
@@ -20,10 +20,6 @@ from codeta.forms.validators import Exists
 from codeta.forms.login import LoginForm
 from codeta.models.course import Course
 from codeta.models.user import User
-
-@app.route('/')
-def homepage():
-    return render_template('codeta/home.html')
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
@@ -145,15 +141,3 @@ def course_home(username, course):
 def logout():
     logout_user()
     return render_template('user/logout.html')
-
-@app.route('/about')
-def about():
-    return render_template('user/about.html')
-
-@app.route('/support')
-def support():
-    return render_template('user/support.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('user/contact.html')
