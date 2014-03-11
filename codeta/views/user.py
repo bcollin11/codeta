@@ -144,4 +144,16 @@ def course_home(username, course):
 @login_required
 def logout():
     logout_user()
-    return 'You logged out.'
+    return render_template('user/logout.html')
+
+@app.route('/about')
+def about():
+    return render_template('user/about.html')
+
+@app.route('/support')
+def support():
+    return render_template('user/support.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('user/contact.html')
