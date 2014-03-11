@@ -1,7 +1,20 @@
 {% extends "helpers/layout.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Join{% endblock %}
 {% block body %}
 
-
-        <div class="centering"><img src="/static/images/GrayLogo.png" alt="Code TA - The optimal code grader"></div>
+<h1>User Courses</h1>
+    <div id="user_courses">
+        {% if courses %}
+            <ul>
+                {% for c in courses %}
+                    <li>Course: {{ c.title }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span>You are not currently enrolled in any courses</span>
+        {% endif %}
+    </div>
+{% if g.user.is_authenticated() and g.user.username == username %}
+    <a href="{{ url_for('user_home', username=username) }}new">Create a new course</a>
+{% endif %}
 {% endblock %}
