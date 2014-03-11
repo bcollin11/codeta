@@ -129,13 +129,6 @@ def course_delete(username, course_title):
         # unauthenticated user
         return redirect(url_for('login'))
 
-@app.route('/<username>/<course>/')
-def course_home(username, course):
-    """
-        Homepage for the course, displays recent assignments
-    """
-    return 'User %s, course %s' % (username, course)
-
 @app.route('/logout')
 @login_required
 def logout():
