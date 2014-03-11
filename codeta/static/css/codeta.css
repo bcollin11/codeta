@@ -1,0 +1,35 @@
+html {
+  background-image: url('../images/background1.png');
+}
+
+div.masternav {
+  margin-left:40%;
+  text-align:center;
+  margin-top:20px;
+  padding-right:8%;
+}
+
+p.ctitle {
+  font-size:18pt;
+}
+
+.jumbotron {
+  background-color:#F4F4F4;
+  padding-top:20px;
+  margin-bottom:10px;
+  padding-bottom:20px;
+}
+
+.centering {
+  text-align:center;
+}
+
+.footer {
+  height:20px;
+  margin-bottom:8px;
+  width:90%;
+}
+
+body {
+  background-color:rgba(0,0,0,0);
+}
