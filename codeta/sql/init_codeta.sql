@@ -5,6 +5,18 @@
 
 */
 
+drop table if exists Users cascade;
+drop table if exists Instructor cascade;
+drop table if exists Student cascade;
+drop table if exists Course cascade;
+drop table if exists InstructorTeachesCourse cascade;
+drop table if exists StudentEnrollsCourse cascade;
+drop table if exists Assignment cascade;
+drop table if exists Submission cascade;
+drop table if exists AssignmentUpload cascade;
+drop table if exists SubmissionUpload cascade;
+drop table if exists UserFile cascade;
+
 create table if not exists Users (
     user_id bigserial primary key,
     email varchar(100) not null,
