@@ -238,6 +238,32 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.app.get('/this/should/not/exist/ever/', follow_redirects=True)
         assert b'404 error :(' in rc.data
 
+    def test_settings_name(self):
+        """
+            Make sure our user can change their first and last name
+        """
+        self.register(app.config['TEST_USER'], app.config['TEST_PW'])
+        rc = self.login(app.config['TEST_USER'], app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.app.post('/%s/settings/name' % app.config['TEST_USER'],
+            data={'fname': 'changedfname', 'lname': 'changedlname'},
+            follow_redirects=True)
+        assert b'changedfname' in rc.data
+        assert b'changedlname' in rc.data
+
+        rc = self.app.post('/%s/settings/name' % app.config['TEST_USER'],
+            data={'fname': 'anotherfnamechange', 'lname': ''},
+            follow_redirects=True)
+        assert b'anotherfnamechange' in rc.data
+        assert b'changedlname' in rc.data
+
+        rc = self.app.post('/%s/settings/name' % app.config['TEST_USER'],
+            data={'fname': '', 'lname': 'anotherlnamechange'},
+            follow_redirects=True)
+        logger.debug(rc.data)
+        assert b'anotherfnamechange' in rc.data
+        assert b'anotherlnamechange' in rc.data
 
 if __name__ == '__main__':
     unittest.main()

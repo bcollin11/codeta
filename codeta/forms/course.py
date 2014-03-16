@@ -7,7 +7,6 @@ from flask_wtf import Form
 from wtforms import TextField, ValidationError, validators
 from codeta.forms.validators import Exists
 
-# TODO add custom validator
 class CourseCreateForm(Form):
     """
         A form for creating a new course

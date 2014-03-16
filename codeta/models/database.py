@@ -49,7 +49,9 @@ class Postgres(object):
                         int(user['user_id']),
                         user['username'],
                         user['password'],
-                        user['email'])
+                        user['email'],
+                        user['first_name'],
+                        user['last_name'])
                 logger.debug("User: %s - auth success." % (username))
             else:
                 user = None
@@ -131,7 +133,9 @@ class Postgres(object):
                     int(user['user_id']),
                     user['username'],
                     user['password'],
-                    user['email'])
+                    user['email'],
+                    user['first_name'],
+                    user['last_name'])
 
         cur.close()
         return user

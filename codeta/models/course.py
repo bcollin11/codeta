@@ -137,9 +137,7 @@ class Course(object):
         data = (username, )
         courses = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
         if courses:
-            logger.debug(courses)
             for c in courses:
-                logger.debug(c)
                 course = Course(c.get('title'),
                         c.get('identifer'),
                         c.get('section'),

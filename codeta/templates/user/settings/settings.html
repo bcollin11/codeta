@@ -1,0 +1,21 @@
+{% extends "helpers/layout.html" %}
+{% block title %}Join{% endblock %}
+{% block body %}
+
+<h1>Settings</h1>
+    {% if user_data %}
+        <ul>
+            <li>
+                <p>Your name: {{ user_data.get('fname') }} {{ user_data.get('lname') }}</p>
+                <p><a class="btn btn-default" href="{{ url_for('user_setting_name', username=username) }}">Change your name</a></p>
+            </li>
+            <li>
+                <p>Your email: {{ user_data.get('email') }}</p>
+                <p><a class="btn btn-default" href="{{ url_for('user_setting_email', username=username) }}">Change your email</a></p>
+            </li>
+            <li>
+            <p><a class="btn btn-default" href="{{ url_for('user_setting_password', username=username) }}">Change your password</a></p>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
