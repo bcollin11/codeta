@@ -1,0 +1,15 @@
+{% extends "helpers/layout.html" %}
+{% block title %}Join{% endblock %}
+{% block body %}
+    <h2>Change your name</h2>
+    {% from "helpers/_formhelpers.html" import render_field %}
+    <form method="POST" action="{{ url_for('user_setting_name', username=username) }}">
+        <dl>
+            {{ render_field(form.fname) }}
+            {{ render_field(form.lname) }}
+            {{ form.hidden_tag() }}
+        </dl>
+        <input type="submit" value="Change name">
+    </form>
+
+{% endblock %}

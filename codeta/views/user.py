@@ -16,6 +16,7 @@ from flask.ext.login import (current_user, login_required,
 from codeta import app, login_manager, logger
 from codeta.forms.registration import RegistrationForm
 from codeta.forms.course import CourseCreateForm, CourseDeleteForm
+from codeta.forms.user_settings import UserNameForm
 from codeta.forms.validators import Exists
 from codeta.forms.login import LoginForm
 from codeta.models.course import Course
@@ -60,7 +61,7 @@ def user_home(username):
         User's homepage. Displays things about their courses
         and current assignments
     """
-    u = User(None, username, None, None)
+    u = User(None, username, None, None, None, None)
     courses = u.get_courses()
 
     return render_template('user/home.html', courses=courses, username=username)
@@ -128,6 +129,51 @@ def course_delete(username, course_title):
     else:
         # unauthenticated user
         return redirect(url_for('login'))
+
+@app.route('/<username>/settings')
+@login_required
+def user_settings(username):
+    """
+        User's settings page to change different settings
+    """
+    if g.user.username == username:
+        user_data = {
+            'fname': g.user.fname,
+            'lname': g.user.lname,
+            'email': g.user.email
+        }
+        return render_template('user/settings/settings.html', user_data=user_data, username=username)
+    else:
+        # unauth user
+        return redirect(url_for('user_settings', username=g.user.username))
+
+@app.route('/<username>/settings/name', methods=['GET', 'POST'])
+@login_required
+def user_setting_name(username):
+    """
+        Page for changing the user's name
+    """
+    if g.user.username == username:
+        form = UserNameForm()
+        if form.validate_on_submit():
+            # change the name
+            g.user.set_name(request.form['fname'], request.form['lname'])
+            return redirect(url_for('user_settings', username=g.user.username))
+        else:
+            return render_template('user/settings/name.html', username=g.user.username, form=form)
+    else:
+        # unauthorized user
+        return redirect(url_for('user_settings', username=g.user.username))
+
+@app.route('/<username>/settings/email', methods=['GET', 'POST'])
+@login_required
+def user_setting_email(username):
+    pass
+
+@app.route('/<username>/settings/password', methods=['GET', 'POST'])
+@login_required
+def user_setting_password(username):
+    pass
 
 @app.route('/logout')
 @login_required
