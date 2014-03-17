@@ -19,10 +19,10 @@ def before_request():
         Set the current user =
         user in the request for
         flask-login
-"""
+    """
     g.user = current_user
 
-
+# Login Manager views
 @login_manager.unauthorized_handler
 def unauthorized():
     """
@@ -31,6 +31,24 @@ def unauthorized():
     """
     form = LoginForm(request.form)
     return render_template('user/login.html', form=form)
+
+@login_manager.needs_refresh_handler
+def refresh_login():
+    error = None
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = app.db.auth_user(
+                request.form['username'],
+                request.form['password'])
+        if user:
+            confirm_login(user)
+            logger.info('User: %s - login auth success.' % (request.form['username']))
+            return redirect(url_for('user_home', username=user.username))
+        else:
+            logger.info('User: %s - login auth failure.' % (request.form['username']))
+            error = 'Invalid username or password.'
+    return render_template('user/login.html', form=form, error=error)
+
 
 @app.errorhandler(404)
 def page_not_found(error):

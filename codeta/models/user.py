@@ -2,6 +2,7 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 
 from codeta import app, logger
 from codeta.models.course import Course
+from codeta.models.security import Auth
 
 class User(UserMixin):
     def __init__(self, user_id, username, password, email, fname, lname, active=True, courses=[]):
@@ -117,3 +118,24 @@ class User(UserMixin):
         )
         app.db.exec_query(sql, data, 'commit')
         self.email = email
+
+    def set_password(self, password):
+        """
+            Updates a user's password in the database
+        """
+        auth = Auth()
+        pw_hash = auth.hash_password(password)
+
+        sql = ("""
+            update Users set
+                password = (%s)
+            where
+                user_id = (%s)
+            """)
+
+        data = (
+            pw_hash,
+            int(self.user_id),
+        )
+        app.db.exec_query(sql, data, 'commit')
+        self.password = pw_hash
