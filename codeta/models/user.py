@@ -99,3 +99,21 @@ class User(UserMixin):
             )
             self.lname = lname
         app.db.exec_query(sql, data, 'commit')
+
+    def set_email(self, email):
+        """
+            Updates the user's email in the database
+        """
+        sql = ("""
+            update Users set
+                email = (%s)
+            where
+                user_id = (%s)
+            """)
+
+        data = (
+            email,
+            int(self.user_id),
+        )
+        app.db.exec_query(sql, data, 'commit')
+        self.email = email
