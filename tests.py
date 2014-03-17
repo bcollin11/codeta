@@ -238,7 +238,7 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.app.get('/this/should/not/exist/ever/', follow_redirects=True)
         assert b'404 error :(' in rc.data
 
-    def test_settings_name(self):
+    def test_setting_name(self):
         """
             Make sure our user can change their first and last name
         """
@@ -264,6 +264,31 @@ class CodetaTestCase(unittest.TestCase):
         logger.debug(rc.data)
         assert b'anotherfnamechange' in rc.data
         assert b'anotherlnamechange' in rc.data
+
+    def test_setting_email(self):
+        """
+            Make sure we can change our email
+        """
+        self.register(app.config['TEST_USER'], app.config['TEST_PW'])
+        rc = self.login(app.config['TEST_USER'], app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.app.post('/%s/settings/email' % app.config['TEST_USER'],
+            data={'email': 'changed@changed.com', 'confirm': 'changed@changed.com'},
+            follow_redirects=True)
+
+        assert b'changed@changed.com' in rc.data
+
+        rc = self.app.post('/%s/settings/email' % app.config['TEST_USER'],
+            data={'email': 'changed@changed.com', 'confirm': 'notthesame@changed.com'},
+            follow_redirects=True)
+
+        assert b'must match' in rc.data
+
+        rc = self.app.post('/%s/settings/email' % app.config['TEST_USER'],
+            data={'email': 'notvalidcom', 'confirm': 'notthesame@changed.com'},
+            follow_redirects=True)
+        assert b'must enter a valid email' in rc.data
 
 if __name__ == '__main__':
     unittest.main()

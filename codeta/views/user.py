@@ -16,7 +16,7 @@ from flask.ext.login import (current_user, login_required,
 from codeta import app, login_manager, logger
 from codeta.forms.registration import RegistrationForm
 from codeta.forms.course import CourseCreateForm, CourseDeleteForm
-from codeta.forms.user_settings import UserNameForm
+from codeta.forms.user_settings import UserNameForm, UserEmailForm
 from codeta.forms.validators import Exists
 from codeta.forms.login import LoginForm
 from codeta.models.course import Course
@@ -168,7 +168,17 @@ def user_setting_name(username):
 @app.route('/<username>/settings/email', methods=['GET', 'POST'])
 @login_required
 def user_setting_email(username):
-    pass
+    if g.user.username == username:
+        form = UserEmailForm()
+        if form.validate_on_submit():
+            # change the name
+            g.user.set_email(request.form['email'])
+            return redirect(url_for('user_settings', username=g.user.username))
+        else:
+            return render_template('user/settings/email.html', username=g.user.username, form=form)
+    else:
+        # unauthorized user
+        return redirect(url_for('user_settings', username=g.user.username))
 
 @app.route('/<username>/settings/password', methods=['GET', 'POST'])
 @login_required

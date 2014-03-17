@@ -1,0 +1,15 @@
+{% extends "helpers/layout.html" %}
+{% block title %}Change Email{% endblock %}
+{% block body %}
+    <h2>Change your email</h2>
+    {% from "helpers/_formhelpers.html" import render_field %}
+    <form method="POST" action="{{ url_for('user_setting_email', username=username) }}">
+        <dl>
+            {{ render_field(form.email) }}
+            {{ render_field(form.confirm) }}
+            {{ form.hidden_tag() }}
+        </dl>
+        <input type="submit" value="Change email">
+    </form>
+
+{% endblock %}
