@@ -290,5 +290,21 @@ class CodetaTestCase(unittest.TestCase):
             follow_redirects=True)
         assert b'must enter a valid email' in rc.data
 
+    def test_setting_password(self):
+        """
+            Test changing password
+        """
+        self.register(app.config['TEST_USER'], app.config['TEST_PW'])
+        rc = self.login(app.config['TEST_USER'], app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.app.post('/%s/settings/password' % app.config['TEST_USER'],
+            data={'password': 'changed_password', 'confirm': 'changed_password'},
+            follow_redirects=True)
+
+        self.logout()
+        rc = self.login(app.config['TEST_USER'], 'changed_password')
+        assert b'Logout' in rc.data
+
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,7 @@
 """
 
 from flask_wtf import Form
-from wtforms import TextField, ValidationError, validators
+from wtforms import TextField, PasswordField, ValidationError, validators
 
 class UserNameForm(Form):
 
@@ -26,3 +26,12 @@ class UserEmailForm(Form):
         validators.Email(message='You must enter a valid email address.')
         ])
     confirm = TextField('Repeat email address', [validators.Length(min=3, max=100)])
+
+class UserPwForm(Form):
+
+    password = PasswordField('New Password (atleast 9 characters)', [
+        validators.Required(),
+        validators.EqualTo('confirm', message='Passwords must match.'),
+        validators.Length(min=9)
+        ])
+    confirm = PasswordField('Repeat Password')
