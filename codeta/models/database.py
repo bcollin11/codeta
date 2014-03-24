@@ -26,41 +26,6 @@ class Postgres(object):
         app.db = self
         self.app = app
 
-    def auth_user(self, username, password):
-        """
-            Authenticates a user and returns a User object
-            if the correct credentials were provided
-            otherwise, return None
-        """
-        db = self.get_db()
-        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        logger.debug("User: %s - Pass: %s - auth attempt. " % (username, password))
-        # hash the password and store it in the db
-        cur.execute("SELECT * FROM Users WHERE username = (%s)", (username, ))
-        user = cur.fetchone()
-        colnames = [desc[0] for desc in cur.description]
-
-        if user:
-            h = user['password']
-            if(self.auth.check_password(password, h)):
-                user = dict(zip(colnames, user))
-                user = User(
-                        int(user['user_id']),
-                        user['username'],
-                        user['password'],
-                        user['email'],
-                        user['first_name'],
-                        user['last_name'])
-                logger.debug("User: %s - auth success." % (username))
-            else:
-                user = None
-
-        if not user:
-            logger.debug("User: %s - auth failure." % (username))
-
-        cur.close()
-        return user
 
     def close_db(self):
         """

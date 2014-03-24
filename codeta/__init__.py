@@ -50,9 +50,11 @@ if app.config['DEBUG_LOGGING']:
     dbg_handler.setLevel(logging.DEBUG)
     logger.addHandler(dbg_handler)
 
-# Load database model
-from codeta.models.database import Postgres
+# Configure authentication
 auth = Auth()
+
+# Configure database
+from codeta.models.database import Postgres
 db = Postgres(auth, app)
 
 # login_manager config
