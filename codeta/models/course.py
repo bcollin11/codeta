@@ -19,7 +19,7 @@ class Course(object):
         self.instructor_id = instructor_id
         self.course_id = course_id
 
-    def add_course(self):
+    def create(self):
         """
             Adds this course to the database
             Returns the course_id of the added course on success
@@ -112,8 +112,8 @@ class Course(object):
 
     def get_courses(username):
         """
-            static function to fetches a list of dictionaries, each tuple
-            containing a course the user is an instructor in.
+            fetches a list of Course objects the username
+            is an instructor in.
 
             Returns the list on success, None on error
         """
@@ -177,7 +177,7 @@ class Course(object):
     get_courses = Callable(get_courses)
 
     def delete_course(course_id):
-        """ Delete a course with the given name """
+        """ Delete a course with the given course_id """
 
         sql = ("""
             delete from
