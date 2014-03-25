@@ -105,29 +105,6 @@ class Postgres(object):
                 db.cursor().execute(f.read())
             db.commit()
 
-    def register_user(self, username, password, email, fname, lname):
-        """
-            Register a user in the database
-        """
-        with self.app.app_context():
-            db = self.get_db()
-
-            pw_hash = self.auth.hash_password(password)
-
-            sql = "INSERT INTO Users (username, password, email, first_name, last_name) \
-                VALUES (%s, %s, %s, %s, %s)"
-
-            data = (
-                username,
-                pw_hash,
-                email,
-                fname,
-                lname,
-            )
-
-            db.cursor().execute(sql, data)
-            db.commit()
-
     def exec_query(self, sql, data, *args, **kwargs):
         """
             Executes a database query and returns the result

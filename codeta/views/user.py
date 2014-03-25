@@ -27,12 +27,13 @@ def join():
     """ Register the user for an account """
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        rc = app.db.register_user(
+        user = User(-1,
                 request.form['username'],
                 request.form['password'],
                 request.form['email'],
                 request.form['fname'],
                 request.form['lname'])
+        rc = user.create()
 
         return redirect(url_for('login'))
     return render_template('user/join.html', form=form)

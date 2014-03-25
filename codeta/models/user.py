@@ -208,3 +208,34 @@ class User(UserMixin):
                     user['last_name'])
         return user
     get_user = Callable(get_user)
+
+    def create(self):
+        """
+            Register a user in the database
+        """
+        pw_hash = auth.hash_password(self.password)
+
+        sql = ("""
+            insert into Users
+                (username, password, email, first_name, last_name)
+            values
+                (%s, %s, %s, %s, %s)
+            returning
+                user_id
+            """)
+
+        data = (
+            self.username,
+            pw_hash,
+            self.email,
+            self.fname,
+            self.lname,
+        )
+
+        user_id = app.db.exec_query(sql, data, 'commit', 'returning')
+        if user_id:
+            self.user_id = user_id
+            logger.debug("Created new user_id: %s | username: %s" % (user_id, self.username))
+        else:
+            logger.debug("Failed to create username: %s" % (username))
+        return user_id
