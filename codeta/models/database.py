@@ -79,32 +79,6 @@ class Postgres(object):
             g.pgsql_db = self.connect_db()
         return g.pgsql_db
 
-    def get_user(self, user_id):
-        """
-            Creates a new User object from the database
-            returns a User object if found, otherwise None
-        """
-        user_id = int(user_id)
-
-        db = self.get_db()
-        cur = db.cursor()
-        cur.execute("SELECT * FROM Users WHERE user_id = (%s)", (user_id, ))
-        user = cur.fetchone()
-        colnames = [desc[0] for desc in cur.description]
-
-        if user:
-            user = dict(zip(colnames, user))
-            user = User(
-                    int(user['user_id']),
-                    user['username'],
-                    user['password'],
-                    user['email'],
-                    user['first_name'],
-                    user['last_name'])
-
-        cur.close()
-        return user
-
     def get_username(self, username):
         """
             Checks to see if a username already exists in the db.
