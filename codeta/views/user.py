@@ -41,8 +41,8 @@ def join():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
-    form = LoginForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = LoginForm()
+    if form.validate_on_submit():
         user = User.auth_user(
                 request.form['username'],
                 request.form['password'])
