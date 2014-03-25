@@ -42,7 +42,7 @@ def login():
     error = None
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = app.db.auth_user(
+        user = User.auth_user(
                 request.form['username'],
                 request.form['password'])
         if user:

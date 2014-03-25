@@ -1,8 +1,8 @@
 from flask.ext.login import UserMixin, AnonymousUserMixin
 
-from codeta import app, logger
+from codeta import app, auth, logger
 from codeta.models.course import Course
-from codeta.models.security import Auth
+from codeta.util.helpers import Callable
 
 class User(UserMixin):
     def __init__(self, user_id, username, password, email, fname, lname, active=True, courses=[]):
@@ -123,7 +123,6 @@ class User(UserMixin):
         """
             Updates a user's password in the database
         """
-        auth = Auth()
         pw_hash = auth.hash_password(password)
 
         sql = ("""
@@ -139,3 +138,42 @@ class User(UserMixin):
         )
         app.db.exec_query(sql, data, 'commit')
         self.password = pw_hash
+
+    def auth_user(username, password):
+        """
+            Authenticates a user and returns a User object
+            if the correct credentials were provided
+            otherwise, return None
+        """
+        logger.debug("User: %s - Pass: %s - auth attempt. " % (username, password))
+
+        sql = ("""
+            select
+                *
+            from
+                Users
+            where
+                username = (%s)
+            """)
+
+        data = (
+            username,
+        )
+
+        user = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
+        if user:
+            user = user[0]
+            if(auth.check_password(password, user['password'])):
+                user = User(
+                    int(user['user_id']),
+                    user['username'],
+                    user['password'],
+                    user['email'],
+                    user['first_name'],
+                    user['last_name'])
+                logger.debug("User: %s - auth success." % (username))
+            else:
+                user = None
+                logger.debug("User: %s - auth failure." % (username))
+        return user
+    auth_user = Callable(auth_user)
