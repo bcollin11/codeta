@@ -1,4 +1,5 @@
-from wtforms import Form, ValidationError, BooleanField, TextField, PasswordField, validators
+from flask_wtf import Form
+from wtforms import ValidationError, BooleanField, TextField, PasswordField, validators
 
 from codeta import app, db
 
