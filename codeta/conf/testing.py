@@ -26,5 +26,3 @@ TEST_COURSE_DESCRIPTION = 'Test course description text'
 LOGGER = 'testing'
 DEBUG_LOGGING = True
 DEBUG_LOG_PATH = '/tmp/codeta-debug.log'
-
-

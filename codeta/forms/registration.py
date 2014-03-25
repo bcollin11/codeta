@@ -1,8 +1,10 @@
-from wtforms import Form, ValidationError, BooleanField, TextField, PasswordField, validators
+from flask_wtf import Form
+from wtforms import ValidationError, BooleanField, TextField, PasswordField, validators
 
-from codeta import app, db
+from codeta.models.user import User
 
 class RegistrationForm(Form):
+
     username = TextField('Username', [validators.Length(min=1, max=100)])
     email = TextField('Email Address', [
         validators.Length(min=1, max=100),
@@ -21,7 +23,7 @@ class RegistrationForm(Form):
     lname = TextField('Last Name', [validators.Length(min=1, max=100)])
 
     def validate_username(form, field):
-        """ make sure the username is not already taken """
+        """ make sure username is not already taken """
 
-        if app.db.get_username(field.data):
+        if User.check_username(field.data):
             raise ValidationError("Sorry, that username is already taken.")

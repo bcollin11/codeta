@@ -13,7 +13,7 @@ from flask.ext.login import (current_user, login_required,
         login_user, logout_user, confirm_login,
         fresh_login_required)
 
-from codeta import app, login_manager, logger
+from codeta import app, auth, login_manager, logger
 from codeta.forms.registration import RegistrationForm
 from codeta.forms.course import CourseCreateForm, CourseDeleteForm
 from codeta.forms.user_settings import UserNameForm, UserEmailForm, UserPwForm
@@ -25,8 +25,8 @@ from codeta.models.user import User
 @app.route('/join', methods=['GET', 'POST'])
 def join():
     """ Register the user for an account """
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegistrationForm()
+    if form.validate_on_submit():
         user = User(-1,
                 request.form['username'],
                 request.form['password'],
@@ -157,8 +157,11 @@ def user_setting_name(username):
     if g.user.username == username:
         form = UserNameForm()
         if form.validate_on_submit():
-            # change the name
-            g.user.set_name(request.form['fname'], request.form['lname'])
+            if request.form['fname']:
+                g.user.fname = request.form['fname']
+            if request.form['lname']:
+                g.user.lname = request.form['lname']
+            g.user.update()
             return redirect(url_for('user_settings', username=g.user.username))
         else:
             return render_template('user/settings/name.html', username=g.user.username, form=form)
@@ -172,8 +175,8 @@ def user_setting_email(username):
     if g.user.username == username:
         form = UserEmailForm()
         if form.validate_on_submit():
-            # change the name
-            g.user.set_email(request.form['email'])
+            g.user.email = request.form['email']
+            g.user.update()
             return redirect(url_for('user_settings', username=g.user.username))
         else:
             return render_template('user/settings/email.html', username=g.user.username, form=form)
@@ -187,8 +190,10 @@ def user_setting_password(username):
     if g.user.username == username:
         form = UserPwForm()
         if form.validate_on_submit():
-            # change the name
-            g.user.set_password(request.form['password'])
+            pw_hash = auth.hash_password(request.form['password'])
+            if pw_hash:
+                g.user.password = pw_hash
+                g.user.update()
             return redirect(url_for('user_settings', username=g.user.username))
         else:
             return render_template('user/settings/password.html', username=g.user.username, form=form)
