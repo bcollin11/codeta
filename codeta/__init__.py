@@ -63,7 +63,8 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.get_user(user_id)
+    return User.get_user(user_id)
+#db.get_user(user_id)
 
 # Import all our models and views
 from codeta.views.user import *

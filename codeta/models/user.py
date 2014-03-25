@@ -177,3 +177,65 @@ class User(UserMixin):
                 logger.debug("User: %s - auth failure." % (username))
         return user
     auth_user = Callable(auth_user)
+
+    def get_user(user_id):
+        """
+            Creates a new User object from the database
+            returns a User object if found, otherwise None
+        """
+        sql = ("""
+            select
+                *
+            from
+                Users
+            where
+                user_id = (%s)
+            """)
+
+        data = (
+            int(user_id),
+        )
+
+        user = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
+        if user:
+            user = user[0]
+            user = User(
+                    int(user['user_id']),
+                    user['username'],
+                    user['password'],
+                    user['email'],
+                    user['first_name'],
+                    user['last_name'])
+        return user
+    get_user = Callable(get_user)
+
+    def create(self):
+        """
+            Register a user in the database
+        """
+        pw_hash = auth.hash_password(self.password)
+
+        sql = ("""
+            insert into Users
+                (username, password, email, first_name, last_name)
+            values
+                (%s, %s, %s, %s, %s)
+            returning
+                user_id
+            """)
+
+        data = (
+            self.username,
+            pw_hash,
+            self.email,
+            self.fname,
+            self.lname,
+        )
+
+        user_id = app.db.exec_query(sql, data, 'commit', 'returning')
+        if user_id:
+            self.user_id = user_id
+            logger.debug("Created new user_id: %s | username: %s" % (user_id, self.username))
+        else:
+            logger.debug("Failed to create username: %s" % (username))
+        return user_id
