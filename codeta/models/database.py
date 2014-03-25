@@ -79,22 +79,6 @@ class Postgres(object):
             g.pgsql_db = self.connect_db()
         return g.pgsql_db
 
-    def get_username(self, username):
-        """
-            Checks to see if a username already exists in the db.
-            returns True if username is found, otherwise False
-        """
-
-        user = None
-        with self.app.app_context():
-            if username:
-                db = self.get_db()
-                cur = db.cursor()
-                cur.execute("SELECT username FROM Users WHERE username = (%s)", (username, ))
-                user = cur.fetchone()
-                cur.close()
-        return user
-
     def init_db(self):
         """
             create the database tables in teh schema if not found

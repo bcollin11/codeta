@@ -25,8 +25,8 @@ from codeta.models.user import User
 @app.route('/join', methods=['GET', 'POST'])
 def join():
     """ Register the user for an account """
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegistrationForm()
+    if form.validate_on_submit():
         user = User(-1,
                 request.form['username'],
                 request.form['password'],

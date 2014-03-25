@@ -51,6 +51,35 @@ class User(UserMixin):
         """ Get a new list of courses from the database """
         self.courses = Course.get_courses(self.username)
 
+    def read(self):
+        """
+            Update the User member variables with fresh data from the database
+        """
+
+        sql = ("""
+            select
+                *
+            from
+                Users
+            where
+                user_id = (%s)
+            """)
+
+        data = (
+            int(self.user_id),
+        )
+
+        user = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
+        if user:
+            user = user[0]
+            self.user_id = int(user['user_id'])
+            self.username = user['username']
+            self.password = user['password']
+            self.email = user['email']
+            self.fname = user['first_name']
+            self.lname = user['last_name']
+        return user
+
     def set_name(self, fname=None, lname=None):
         """ Update the user's name in the db """
         if not (fname or lname):
@@ -239,3 +268,29 @@ class User(UserMixin):
         else:
             logger.debug("Failed to create username: %s" % (username))
         return user_id
+
+    def check_username(username):
+        """
+            Checks to see if a username already exists in the db.
+            returns username if username is found, otherwise None
+        """
+
+        sql = ("""
+            select
+                username
+            from
+                Users
+            where
+                username = (%s)
+            """)
+
+        data = (
+            username,
+        )
+
+        username = app.db.exec_query(sql, data, 'fetchall', 'return_dict')
+        if username:
+            return username[0].get('username')
+        else:
+            return None
+    check_username = Callable(check_username)
