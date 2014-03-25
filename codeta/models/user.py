@@ -51,6 +51,38 @@ class User(UserMixin):
         """ Get a new list of courses from the database """
         self.courses = Course.get_courses(self.username)
 
+    def create(self):
+        """
+            Register a user in the database
+        """
+        pw_hash = auth.hash_password(self.password)
+
+        sql = ("""
+            insert into Users
+                (username, password, email, first_name, last_name)
+            values
+                (%s, %s, %s, %s, %s)
+            returning
+                user_id
+            """)
+
+        data = (
+            self.username,
+            pw_hash,
+            self.email,
+            self.fname,
+            self.lname,
+        )
+
+        user_id = app.db.exec_query(sql, data, 'commit', 'returning')
+        if user_id:
+            self.user_id = user_id
+            self.password = pw_hash
+            logger.debug("Created new user_id: %s | username: %s" % (user_id, self.username))
+        else:
+            logger.debug("Failed to create username: %s" % (username))
+        return user_id
+
     def read(self):
         """
             Update the User member variables with fresh data from the database
@@ -80,93 +112,34 @@ class User(UserMixin):
             self.lname = user['last_name']
         return user
 
-    def set_name(self, fname=None, lname=None):
-        """ Update the user's name in the db """
-        if not (fname or lname):
-            # No update to fname or lname
-            return
-
-        if fname and lname:
-            sql = ("""
-                update Users set
-                   first_name = (%s),
-                   last_name = (%s)
-                where
-                    user_id = (%s)
-                """)
-
-            data = (
-                fname,
-                lname,
-                int(self.user_id),
-            )
-            self.fname = fname
-            self.lname = lname
-        elif fname:
-            sql = ("""
-                update Users set
-                   first_name = (%s)
-                where
-                    user_id = (%s)
-                """)
-
-            data = (
-                fname,
-                int(self.user_id),
-            )
-            self.fname = fname
-        elif lname:
-            sql = ("""
-                update Users set
-                   last_name = (%s)
-                where
-                    user_id = (%s)
-                """)
-
-            data = (
-                lname,
-                int(self.user_id),
-            )
-            self.lname = lname
-        app.db.exec_query(sql, data, 'commit')
-
-    def set_email(self, email):
+    def update(self):
         """
-            Updates the user's email in the database
+            Update the user's data in the database from member variables
         """
+
         sql = ("""
             update Users set
-                email = (%s)
+                password = (%s),
+                email = (%s),
+                first_name = (%s),
+                last_name = (%s)
             where
                 user_id = (%s)
             """)
 
         data = (
-            email,
+            self.password,
+            self.email,
+            self.fname,
+            self.lname,
             int(self.user_id),
         )
-        app.db.exec_query(sql, data, 'commit')
-        self.email = email
-
-    def set_password(self, password):
-        """
-            Updates a user's password in the database
-        """
-        pw_hash = auth.hash_password(password)
-
-        sql = ("""
-            update Users set
-                password = (%s)
-            where
-                user_id = (%s)
-            """)
-
-        data = (
-            pw_hash,
-            int(self.user_id),
-        )
-        app.db.exec_query(sql, data, 'commit')
-        self.password = pw_hash
+        commit = app.db.exec_query(sql, data, 'commit')
+        if commit:
+            logger.debug("Successfully updated user: %s" % (self.username))
+        else:
+            logger.debug("Failed to update user: %s" % (self.username))
+        return commit
 
     def auth_user(username, password):
         """
@@ -237,37 +210,6 @@ class User(UserMixin):
                     user['last_name'])
         return user
     get_user = Callable(get_user)
-
-    def create(self):
-        """
-            Register a user in the database
-        """
-        pw_hash = auth.hash_password(self.password)
-
-        sql = ("""
-            insert into Users
-                (username, password, email, first_name, last_name)
-            values
-                (%s, %s, %s, %s, %s)
-            returning
-                user_id
-            """)
-
-        data = (
-            self.username,
-            pw_hash,
-            self.email,
-            self.fname,
-            self.lname,
-        )
-
-        user_id = app.db.exec_query(sql, data, 'commit', 'returning')
-        if user_id:
-            self.user_id = user_id
-            logger.debug("Created new user_id: %s | username: %s" % (user_id, self.username))
-        else:
-            logger.debug("Failed to create username: %s" % (username))
-        return user_id
 
     def check_username(username):
         """

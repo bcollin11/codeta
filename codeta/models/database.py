@@ -131,6 +131,9 @@ class Postgres(object):
 
                 if 'commit' in args:
                     db.commit()
+                    # return True so we know the commit went through
+                    if not 'returning' in args:
+                        result = True
 
             except psycopg2.IntegrityError, e:
                 logger.warn('db_query failed: %s' % (e[0]))
