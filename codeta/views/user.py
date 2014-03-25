@@ -59,8 +59,8 @@ def login():
 @app.route('/<username>/')
 def user_home(username):
     """
-        User's homepage. Displays things about their courses
-        and current assignments
+        GET - Show the courses the user is enrolled in.
+            If g.user = username, provide links to add course
     """
     u = User(None, username, None, None, None, None)
     courses = u.get_courses()
@@ -69,9 +69,12 @@ def user_home(username):
 
 @app.route('/<username>/new', methods=['GET', 'POST'])
 @login_required
-def course_add(username):
+def course_create(username):
     """
-        User can create a course here
+        GET - show course creation form
+
+        POST - create the course, add it to g.user.courses and
+            add it to the database
     """
     form = None
     if g.user.is_authenticated():
@@ -84,7 +87,7 @@ def course_add(username):
                         request.form['course_section'],
                         request.form['course_description'],
                         g.user.user_id)
-                course_id = course.add_course()
+                course_id = course.create()
                 if course_id:
                     course.add_instructor(g.user.user_id, course_id)
                     g.user.add_course(course)
@@ -106,7 +109,9 @@ def course_add(username):
 @login_required
 def course_delete(username, course_title):
     """
-        Lets a user delete a course
+        GET - show course deletion form
+
+        POST - delete the course from the database
     """
     form = None
     if g.user.is_authenticated():
@@ -135,7 +140,7 @@ def course_delete(username, course_title):
 @login_required
 def user_settings(username):
     """
-        User's settings page to change different settings
+        GET - Show g.user settings
     """
     if g.user.username == username:
         user_data = {
@@ -152,7 +157,9 @@ def user_settings(username):
 @login_required
 def user_setting_name(username):
     """
-        Page for changing the user's name
+        GET - Show form for changing g.user first and last name
+
+        POST - Change the name in g.user and in the database
     """
     if g.user.username == username:
         form = UserNameForm()
@@ -172,6 +179,11 @@ def user_setting_name(username):
 @app.route('/<username>/settings/email', methods=['GET', 'POST'])
 @login_required
 def user_setting_email(username):
+    """
+        GET - Show form for changing g.user email
+
+        POST - Change the email in g.user and in the database
+    """
     if g.user.username == username:
         form = UserEmailForm()
         if form.validate_on_submit():
@@ -187,6 +199,11 @@ def user_setting_email(username):
 @app.route('/<username>/settings/password', methods=['GET', 'POST'])
 @fresh_login_required
 def user_setting_password(username):
+    """
+        GET - Show password change form
+
+        POST - Update g.user.password to password hash and change it in database
+    """
     if g.user.username == username:
         form = UserPwForm()
         if form.validate_on_submit():
