@@ -2,7 +2,6 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 
 from codeta import app, auth, logger
 from codeta.models.course import Course
-from codeta.util.helpers import Callable
 
 class User(UserMixin):
     def __init__(self, user_id, username, password, email, fname, lname, active=True, courses=[]):
@@ -141,6 +140,7 @@ class User(UserMixin):
             logger.debug("Failed to update user: %s" % (self.username))
         return commit
 
+    @staticmethod
     def auth_user(username, password):
         """
             Authenticates a user and returns a User object
@@ -178,8 +178,8 @@ class User(UserMixin):
                 user = None
                 logger.debug("User: %s - auth failure." % (username))
         return user
-    auth_user = Callable(auth_user)
 
+    @staticmethod
     def get_user(user_id):
         """
             Creates a new User object from the database
@@ -209,8 +209,8 @@ class User(UserMixin):
                     user['first_name'],
                     user['last_name'])
         return user
-    get_user = Callable(get_user)
 
+    @staticmethod
     def check_username(username):
         """
             Checks to see if a username already exists in the db.
@@ -235,4 +235,3 @@ class User(UserMixin):
             return username[0].get('username')
         else:
             return None
-    check_username = Callable(check_username)
