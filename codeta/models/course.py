@@ -1,5 +1,4 @@
 from codeta import app, logger
-from codeta.util.helpers import Callable
 
 class Course(object):
     def __init__(self, title, ident, section, description, instructor_id=None, course_id=None):
@@ -110,6 +109,7 @@ class Course(object):
 
         app.db.exec_query(sql, data, 'commit')
 
+    @staticmethod
     def get_courses(username):
         """
             fetches a list of Course objects the username
@@ -174,8 +174,8 @@ class Course(object):
                 result.append(course)
 
         return result
-    get_courses = Callable(get_courses)
 
+    @staticmethod
     def delete_course(course_id):
         """ Delete a course with the given course_id """
 
@@ -192,4 +192,3 @@ class Course(object):
         )
 
         app.db.exec_query(sql, data, 'commit')
-    delete_course = Callable(delete_course)
