@@ -4,6 +4,8 @@ def extract (path, extpath):
   if zipfile.is_zipfile(path):
     zipf = zipfile.ZipFile(path)
     zipf.extractall(extpath)
+    success = True
   else:
-    return None
+    success = False
+  return success
 

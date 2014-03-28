@@ -18,7 +18,7 @@ from codeta import app, db
 from codeta.conf.testing import *
 from codeta.models.database import Postgres
 from codeta import logger
-import grader.zip as zip
+from grader import zip
 
 class CodetaTestCase(unittest.TestCase):
 
@@ -116,7 +116,6 @@ class CodetaTestCase(unittest.TestCase):
 		file.write("test file")
 	    return True
 	except Exception as ex:
-	    print ex
 	    return False
 
     def create_zip(self,name):
@@ -336,10 +335,10 @@ class CodetaTestCase(unittest.TestCase):
 
     def test_invalid_zip(self):
         """
-	    Make sure an exception is raised when attempting to extract a non-zip file
+	    Make sure extract returns false on failure
 	"""
         self.create_file("empty1")
-	self.assertIsNone(zip.extract("empty1",os.getcwd()))
+	self.assertFalse(zip.extract("empty1",os.getcwd()))
         os.unlink("empty1")
 
     def test_zip_extract(self):
@@ -348,7 +347,7 @@ class CodetaTestCase(unittest.TestCase):
 	"""
         testname = "testZip"
         self.create_zip(testname)
-        zip.extract(testname+".zip",os.getcwd())
+        self.assertTrue(zip.extract(testname+".zip",os.getcwd()))
         folders = os.listdir(os.getcwd())
         assert testname in folders
         files = os.listdir(os.path.join(os.getcwd(),testname))
