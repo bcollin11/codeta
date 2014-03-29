@@ -13,14 +13,18 @@ from flask.ext.login import (current_user, login_required,
 from codeta import app, login_manager, logger
 from codeta.models.course import Course
 from codeta.models.user import User
+from codeta.models.assignment import Assignment
 from codeta.forms.course import CourseCreateForm, CourseDeleteForm
 
 @app.route('/<username>/<course>/')
+@login_required
 def course_home(username, course):
     """
         Homepage for the course, displays recent assignments
     """
-    return 'User %s, course %s' % (username, course)
+    assignments = Assignment.get_assignments(username, course)
+    return render_template('course/home.html', course=course, username=username,
+                            assignments=assignments)
 
 @app.route('/<username>/new', methods=['GET', 'POST'])
 @login_required
@@ -37,7 +41,8 @@ def course_create(username):
             form = CourseCreateForm(g.user.get_course_titles())
             if form.validate_on_submit():
                 # user can create the course
-                course = Course(request.form['course_title'],
+                course = Course(
+                        request.form['course_title'],
                         request.form['course_ident'],
                         request.form['course_section'],
                         request.form['course_description'],

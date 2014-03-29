@@ -8,6 +8,7 @@
             {{ render_field(form.ident) }}
             {{ render_field(form.section) }}
             {{ render_field(form.description) }}
+            {{ form.hidden_tag() }}
         </dl>
         <input type="submit" value="Create">
     </form>

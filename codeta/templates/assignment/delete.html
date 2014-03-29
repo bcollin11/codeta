@@ -1,0 +1,25 @@
+{% extends "helpers/layout.html" %}
+{% block title %}New Assignment{% endblock %}
+{% block body %}
+
+<h1>Delete an assignment</h1>
+
+{% if g.user.is_authenticated() %}
+    {% if form %}
+        <div id="assignment_create_window">
+            <span class="window_title">Delete an assignment</span>
+            {% from "helpers/_formhelpers.html" import render_field %}
+            <form method="post" action="{{ url_for('assignment_delete', 
+                username=g.user.username, course=course, assignment=assignment) }}">
+                <dl>
+                    {{ render_field(form.assignment) }}
+                    {{ render_field(form.confirm) }}
+                    {{ form.hidden_tag() }}
+                </dl>
+                <input type="submit" value="Permanantly Delete">
+            </form>
+        </div>
+    {% endif %}
+
+{% endif %}
+{% endblock %}

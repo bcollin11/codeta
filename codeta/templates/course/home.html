@@ -1,0 +1,22 @@
+{% extends "helpers/layout.html" %}
+{% block title %}{{ course }}{% endblock %}
+{% block body %}
+
+<h1>Course assignments</h1>
+    <div id="course_assignments">
+        {% if assignments %}
+            <ul>
+                {% for a in assignments %}
+                <li><a href="{{ url_for('course_home', username=username, course=course) }}{{ a.title }}">{{ a.title }}</a> | Due date: {{ a.due_date }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span>There are no assignments for this course.</span>
+        {% endif %}
+    </div>
+{% if g.user.is_authenticated() and g.user.username == username %}
+    <a href="{{ url_for('course_home', username=username, course=course) }}new">Create a new assignment</a>
+    <a href="{{ url_for('course_home', username=username, course=course) }}grades">Check student grades</a>
+    <a href="{{ url_for('course_home', username=username, course=course) }}settings">Change course settings</a>
+{% endif %}
+{% endblock %}

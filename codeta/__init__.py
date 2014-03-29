@@ -71,6 +71,7 @@ from codeta.views.user import *
 from codeta.views.util import *
 from codeta.views.main import *
 from codeta.views.course import *
+from codeta.views.assignment import *
 
 from codeta.models.user import User
 

@@ -101,6 +101,55 @@ class CodetaTestCase(unittest.TestCase):
                 'verification': verification,
             }, follow_redirects=True)
 
+
+    def assignment_create(self, username=None, course=None, asn=None, desc=None,
+                        due_date=None, points=None):
+        if not username:
+            username = app.config['TEST_USER']
+
+        if not course:
+            course = app.config['TEST_COURSE_NAME']
+
+        if not asn:
+            asn = app.config['TEST_ASN_NAME']
+
+        if not desc:
+            desc = app.config['TEST_ASN_DESC']
+
+        if not due_date:
+            due_date = app.config['TEST_ASN_DUE']
+
+        if not points:
+            points = app.config['TEST_ASN_POINTS']
+
+        return self.app.post('/%s/%s/new' % (username, course),
+                data = {
+                    'assignment': asn,
+                    'description': desc,
+                    'due_date': due_date,
+                    'points': points,
+                }, follow_redirects=True)
+
+    def assignment_delete(self, username=None, course=None, asn=None,
+                         confirm=None):
+        if not username:
+            username = app.config['TEST_USER']
+
+        if not course:
+            course = app.config['TEST_COURSE_NAME']
+
+        if not asn:
+            asn = app.config['TEST_ASN_NAME']
+
+        if not confirm:
+            confirm = app.config['TEST_ASN_NAME']
+
+        return self.app.post('/%s/%s/%s/delete' % (username, course, asn),
+                data = {
+                    'assignment': asn,
+                    'confirm': asn,
+                }, follow_redirects=True)
+
     def login(self, username, password):
         return self.app.post('/login', data=dict(
             username = username,
@@ -288,7 +337,6 @@ class CodetaTestCase(unittest.TestCase):
         rc = self.app.post('/%s/settings/name' % app.config['TEST_USER'],
             data={'fname': '', 'lname': 'anotherlnamechange'},
             follow_redirects=True)
-        logger.debug(rc.data)
         assert b'anotherfnamechange' in rc.data
         assert b'anotherlnamechange' in rc.data
 
@@ -368,6 +416,33 @@ class CodetaTestCase(unittest.TestCase):
         self.assertEqual(len(lines),2)
         self.unlink_dir(testname)
         os.unlink(testname+".zip")
+
+    def test_assignment_create_delete(self):
+        self.register(app.config['TEST_USER'], app.config['TEST_PW'])
+        # register 2nd user for breaking purposes
+        self.register('TEST', app.config['TEST_PW'])
+        rc = self.login(app.config['TEST_USER'], app.config['TEST_PW'])
+        assert b'Logout' in rc.data
+
+        rc = self.create_course(
+                app.config['TEST_USER'],
+                app.config['TEST_COURSE_NAME'])
+        assert b'Course: %s' % (app.config['TEST_COURSE_NAME']) in rc.data
+
+        rc = self.assignment_create()
+        logger.debug(rc.data)
+        assert b'test_asn' and b'Due date: 2014-05-04' in rc.data
+
+        rc = self.assignment_create()
+        assert b'You already have an assignment called that.' in rc.data
+
+        rc = self.assignment_delete()
+        assert b'404 error' not in rc.data
+        assert b'test_asn' and b'Due date: 2014-05-04' not in rc.data
+
+        rc = self.assignment_create(username='TEST')
+        logger.debug(rc.data)
+        assert b'You can not create an assignment here.' in rc.data
 
 if __name__ == '__main__':
     unittest.main()

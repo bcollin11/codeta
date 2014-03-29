@@ -1,0 +1,27 @@
+{% extends "helpers/layout.html" %}
+{% block title %}New Assignment{% endblock %}
+{% block body %}
+
+<h1>Create a new assignment</h1>
+
+{% if g.user.is_authenticated() %}
+    {% if form %}
+        <div id="assignment_create_window">
+            <span class="window_title">Create a new assignment</span>
+            {% from "helpers/_formhelpers.html" import render_field %}
+            <form method="post" action="{{ url_for('assignment_create', 
+                username=g.user.username, course=course) }}">
+                <dl>
+                    {{ render_field(form.assignment) }}
+                    {{ render_field(form.description) }}
+                    {{ render_field(form.due_date) }}
+                    {{ render_field(form.points) }}
+                    {{ form.hidden_tag() }}
+                </dl>
+                <input type="submit" value="Create">
+            </form>
+        </div>
+    {% endif %}
+
+{% endif %}
+{% endblock %}

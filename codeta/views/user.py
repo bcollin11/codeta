@@ -46,7 +46,7 @@ def login():
         if user:
             login_user(user)
             logger.info('User: %s - login auth success.' % (request.form['username']))
-            return redirect(url_for('homepage'))
+            return redirect(url_for('user_home', username=request.form['username']))
         else:
             logger.info('User: %s - login auth failure.' % (request.form['username']))
             error = 'Invalid username or password.'
