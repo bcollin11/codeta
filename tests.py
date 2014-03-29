@@ -10,6 +10,7 @@ import os
 import unittest
 import psycopg2
 import logging
+import zipfile
 
 os.environ['CODETA_MODE'] = 'testing'
 
@@ -17,6 +18,7 @@ from codeta import app, db
 from codeta.conf.testing import *
 from codeta.models.database import Postgres
 from codeta import logger
+from grader import zip
 
 class CodetaTestCase(unittest.TestCase):
 
@@ -107,6 +109,31 @@ class CodetaTestCase(unittest.TestCase):
 
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
+
+    def create_file(self, name):
+	try:
+	    with open(name,'w') as file:
+		file.write("test file")
+	    return True
+	except Exception as ex:
+	    return False
+
+    def create_zip(self,name):
+        #creates a zip file with one directory and 2 files
+        os.mkdir(name)
+        self.create_file(os.path.join(name,"emptyfile1"))
+        self.create_file(os.path.join(name,"emptyfile2"))
+        newZip = zipfile.ZipFile(name + ".zip", "w")
+        newZip.write(name)
+        newZip.write(os.path.join(name,"emptyfile1"))
+        newZip.write(os.path.join(name,"emptyfile2"))
+        newZip.close()
+        self.unlink_dir(name)
+
+    def unlink_dir(self,folder):
+	for file in os.listdir(os.path.join(os.getcwd(),folder)):
+	    os.unlink(os.path.join(os.getcwd(),folder,file))
+	os.rmdir(folder)
 
     # Unit tests
     def test_homepage(self):
@@ -305,6 +332,42 @@ class CodetaTestCase(unittest.TestCase):
         self.logout()
         rc = self.login(app.config['TEST_USER'], 'changed_password')
         assert b'Logout' in rc.data
+
+    def test_invalid_zip(self):
+        """
+	    Make sure extract returns false on failure
+	"""
+        self.create_file("empty1")
+	self.assertFalse(zip.extract("empty1",os.getcwd()))
+        os.unlink("empty1")
+
+    def test_zip_extract(self):
+	"""
+	    Ensure zip files are extracted and in the right place
+	"""
+        testname = "testZip"
+        self.create_zip(testname)
+        self.assertTrue(zip.extract(testname+".zip",os.getcwd()))
+        folders = os.listdir(os.getcwd())
+        assert testname in folders
+        files = os.listdir(os.path.join(os.getcwd(),testname))
+        assert "emptyfile1" in files
+        assert "emptyfile2" in files
+        self.unlink_dir(testname)
+        os.unlink(testname+".zip")
+
+    def test_zip_overwrite(self):
+	"""
+	    Ensure that extracted files can overwrite other files without error
+	"""
+        testname = "testZip"
+        self.create_zip(testname)
+        zip.extract(testname+".zip",os.getcwd())
+        zip.extract(testname+".zip",os.getcwd())
+        lines = os.listdir(os.path.join(os.getcwd(),testname))
+        self.assertEqual(len(lines),2)
+        self.unlink_dir(testname)
+        os.unlink(testname+".zip")
 
 if __name__ == '__main__':
     unittest.main()
