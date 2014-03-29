@@ -75,7 +75,8 @@ create table if not exists Assignment (
     points_possible integer,
     course_id integer,
 
-    foreign key (course_id) references Course (course_id) on delete cascade
+    foreign key (course_id) references Course (course_id) on delete cascade,
+    unique (title, course_id)
 );
 
 create table if not exists UserFile (
@@ -100,6 +101,7 @@ create table if not exists Submission (
 );
 
 create table if not exists SubmissionUpload (
+    submission_upload_id bigserial primary key,
     user_id integer not null,
     submission_id integer not null,
     symlink text not null,
@@ -109,6 +111,7 @@ create table if not exists SubmissionUpload (
 );
 
 create table if not exists AssignmentUpload (
+    assignment_upload_id bigserial primary key,
     user_id integer not null,
     assignment_id integer not null,
     symlink text not null,

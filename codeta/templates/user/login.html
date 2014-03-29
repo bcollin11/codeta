@@ -8,6 +8,7 @@
         <dl>
             {{ render_field(form.username) }}
             {{ render_field(form.password) }}
+            {{ form.hidden_tag() }}
         </dl>
         <input type="submit" value="Login">
     </form>

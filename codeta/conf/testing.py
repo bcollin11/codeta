@@ -22,6 +22,13 @@ TEST_COURSE_IDENT = 'CSET'
 TEST_COURSE_SECTION = '001'
 TEST_COURSE_DESCRIPTION = 'Test course description text'
 
+# Assignment
+
+TEST_ASN_NAME = 'test_asn'
+TEST_ASN_DESC = 'This is a test course'
+TEST_ASN_DUE = '2014-5-4 23:59:59'
+TEST_ASN_POINTS = '100'
+
 # Logging
 LOGGER = 'testing'
 DEBUG_LOGGING = True
