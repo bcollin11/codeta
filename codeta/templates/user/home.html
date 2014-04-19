@@ -1,13 +1,13 @@
 {% extends "helpers/layout.html" %}
-{% block title %}Join{% endblock %}
+{% block title %}Courses{% endblock %}
 {% block body %}
 
-<h1>User Courses</h1>
+<h2>{{g.user.username}}'s Courses</h2>
     <div id="user_courses">
         {% if courses %}
             <ul>
                 {% for c in courses %}
-		    <li><a href="/{{g.user.username}}/{{c.title}}">{{c.title}}</a></li>
+		    <li><a href="/{{g.user.username}}/{{c.title}}"><lh>{{c.title}}</lh></a> | {{c.ident}}:{{c.section}}</li>
                 {% endfor %}
             </ul>
         {% else %}
