@@ -15,6 +15,6 @@
         {% endif %}
     </div>
 {% if g.user.is_authenticated() and g.user.username == username %}
-    <a href="{{ url_for('user_home', username=username) }}new"><button type="buton" class="btn btn-default">Create a new course</button></a>
+    <a href="{{ url_for('user_home', username=username) }}new"><button type="button" class="btn btn-default">Create a new course</button></a>
 {% endif %}
 {% endblock %}
