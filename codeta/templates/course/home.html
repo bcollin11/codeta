@@ -15,8 +15,8 @@
         {% endif %}
     </div>
 {% if g.user.is_authenticated() and g.user.username == username %}
-    <a href="{{ url_for('course_home', username=username, course=course) }}new">Create a new assignment</a>
-    <a href="{{ url_for('course_home', username=username, course=course) }}grades">Check student grades</a>
-    <a href="{{ url_for('course_home', username=username, course=course) }}settings">Change course settings</a>
+    <a href="{{ url_for('course_home', username=username, course=course) }}new"><button type="button" class="btn btn-default">Create a new assignment</button></a>
+    <a href="{{ url_for('course_home', username=username, course=course) }}grades"><button type="button" class="btn btn-default">Check student grades</button></a>
+    <a href="{{ url_for('course_home', username=username, course=course) }}settings"><button type="button" class="btn btn-default">Change course settings</button></a>
 {% endif %}
 {% endblock %}
