@@ -2,12 +2,12 @@
 {% block title %}{{ course }}{% endblock %}
 {% block body %}
 
-<h1>Course assignments</h1>
+<h2>{{ course }} Assignments</h2>
     <div id="course_assignments">
         {% if assignments %}
             <ul>
                 {% for a in assignments %}
-                <li><a href="{{ url_for('course_home', username=username, course=course) }}{{ a.title }}">{{ a.title }}</a> | Due date: {{ a.due_date }}</li>
+                <li><a href="{{ url_for('course_home', username=username, course=course) }}{{ a.title }}"><lh>{{ a.title }}</lh></a> | Due date: {{ a.due_date }}</li>
                 {% endfor %}
             </ul>
         {% else %}
