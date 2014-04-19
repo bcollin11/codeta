@@ -139,7 +139,7 @@ class Course(object):
         if courses:
             for c in courses:
                 course = Course(c.get('title'),
-                        c.get('identifer'),
+                        c.get('identifier'),
                         c.get('section'),
                         c.get('description'),
                         c.get('user_id'),
@@ -166,7 +166,7 @@ class Course(object):
         if courses:
             for c in courses:
                 course = Course(c.get('title'),
-                        c.get('identifer'),
+                        c.get('identifier'),
                         c.get('section'),
                         c.get('description'),
                         c.get('user_id'),
