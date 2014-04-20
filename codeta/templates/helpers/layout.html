@@ -26,7 +26,18 @@
             <ul class="nav navbar-nav">
               <li><a href="{{ url_for('homepage') }}">Home</a></li>
               {% if g.user.is_authenticated() %}
-              <li><a href="{{ url_for('user_home', username=g.user.username) }}">Classes</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{g.user.username}} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('user_home', username=g.user.username) }}">Courses</a></li>
+                  {% if g.user.courses %}
+                  <li class="divider"></li>
+                  {% for c in g.user.get_courses() %}
+                  <li><a href="/{{g.user.username}}/{{c.title}}">{{c.title}}</a></li>
+		  {% endfor %}
+		</ul>
+              </li> 
+              {% endif %}
 	      {% endif %}
 	      <li><a href="{{ url_for('about') }}">About</a></li>
 	      <li><a href="{{ url_for('support') }}">Support</a></li>
@@ -34,7 +45,6 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
 	      {% if g.user.is_authenticated() %}
-              <li><a>Welcome, {{g.user.username}}!</a></li>
 	      <li><a href="{{ url_for('logout') }}">Logout</a></li>
 	      {% else %}
 	      <li><a href="{{ url_for('join') }}">Join</a></li>
