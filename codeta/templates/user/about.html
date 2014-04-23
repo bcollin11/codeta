@@ -4,8 +4,13 @@
 
 
         <div class="centering"><img src="/static/images/GrayLogo.png" alt="Code TA - The optimal code grader"><p>
-Code TA is a web-based application used to automatically grade code developed by students for programming courses. Professors manage classes and assignments online using the Code TA website. Code is then uploaded, compiled, run, and evaluated by a Python-based server-side program, which returns a grade and feedback regarding any issues. Automating the grading process improves professor efficiency and student feedback.</p>
+<p>Code TA is a web-based application used to automatically grade code developed by students for programming courses. Professors manage classes and assignments online using the Code TA website. Code is then uploaded, compiled, tested, and evaluated by a Python-based server-side program, which returns a report with feedback regarding any issues in the code. Automating the grading process improves professor efficiency and student feedback. </p>
+<p>Testing and evaluation is based upon unit tests provided by the professor. These unit tests can be thought of as a rubric by which a TA grades an assignment. The generated report provides a list of all tests that have been passed or failed, providing feedback to the professor and student as to where the program is weak.</p>
+<p>Code TA was developed as a senior design project at The University of Toledo by four Engineering Technology students. It was born of a desire to improve the grading process in programming courses. Code TA aims to provide a more efficient and accurate grade for student-written programs as well as provide useful feedback to struggling students.</p>
+<p>Code TA currently supports Java and Python submissions.
+</p>
 
-<p>To try it out, <a href="{{ url_for('join') }}">join us!</a></p>
+<p>To try it out, <a href="{{ url_for('join') }}">join us</a>!</p>
+<p>Or view the project source files at <a href="https://github.com/bmoar/codeta">GitHub</a>.</p>
 </div>
 {% endblock %}
