@@ -3,5 +3,14 @@
 {% block body %}
 
 
-        <div class="centering">FAQ?</div>
+        <h2>FAQ</h2>
+<p style="text-decoration:underline;">What is Code TA?</p>
+Code TA is a web-based tool meant to automatically grade programming assignments for professors. To learn more, visit the <a href="/about">about page</a>.<br /><br />
+<p style="text-decoration:underline;">How do I get started?</p>
+First create an account on the Code TA website by clicking here or pressing <a href="/join">Join</a> on the menu bar. After joining and logging in, visit your <a href="{{ url_for('user_home', username=g.user.username) }}"> courses page</a> to add programming courses. From each course page add assignments which need to be graded. For each assignment, you can upload unit tests and student code to be evaluated. A report will be generated with full details on tests passed.<br /><br />
+<p style="text-decoration:underline;">How do I grade an assignment?</p>
+After creating the appropriate course and assignment, upload both the unit tests and student codde.<br /><br />
+<p style="text-decoration:underline;">I've encountered an error. What do I do?</p>
+Please submit a description of the error with the time encountered and a screenshot if possible to one of the team members. Member information can be found on the <a href="/contact">contact page</a>.<br /><br />
+<p>For additional help and support please <a href="/contact">contact us</a>.
 {% endblock %}
